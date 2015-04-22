@@ -25,11 +25,12 @@ import edu.washington.escience.myria.expression.evaluate.ExpressionOperatorParam
     /* Unary */
     @Type(name = "ABS", value = AbsExpression.class), @Type(name = "CAST", value = CastExpression.class),
     @Type(name = "CEIL", value = CeilExpression.class), @Type(name = "COS", value = CosExpression.class),
-    @Type(name = "FLOOR", value = FloorExpression.class), @Type(name = "LEN", value = LenExpression.class),
-    @Type(name = "LOG", value = LogExpression.class), @Type(name = "MD5", value = HashMd5Expression.class),
-    @Type(name = "NEG", value = NegateExpression.class), @Type(name = "NOT", value = NotExpression.class),
-    @Type(name = "SIN", value = SinExpression.class), @Type(name = "SQRT", value = SqrtExpression.class),
-    @Type(name = "TAN", value = TanExpression.class), @Type(name = "UPPER", value = ToUpperCaseExpression.class),
+    @Type(name = "COUNTER", value = CounterExpression.class), @Type(name = "FLOOR", value = FloorExpression.class),
+    @Type(name = "LEN", value = LenExpression.class), @Type(name = "LOG", value = LogExpression.class),
+    @Type(name = "MD5", value = HashMd5Expression.class), @Type(name = "NEG", value = NegateExpression.class),
+    @Type(name = "NOT", value = NotExpression.class), @Type(name = "SIN", value = SinExpression.class),
+    @Type(name = "SQRT", value = SqrtExpression.class), @Type(name = "TAN", value = TanExpression.class),
+    @Type(name = "UPPER", value = ToUpperCaseExpression.class),
     /* Binary */
     @Type(name = "AND", value = AndExpression.class), @Type(name = "DIVIDE", value = DivideExpression.class),
     @Type(name = "EQ", value = EqualsExpression.class), @Type(name = "GREATER", value = GreaterExpression.class),
@@ -40,7 +41,8 @@ import edu.washington.escience.myria.expression.evaluate.ExpressionOperatorParam
     @Type(name = "LT", value = LessThanExpression.class), @Type(name = "MINUS", value = MinusExpression.class),
     @Type(name = "MODULO", value = ModuloExpression.class), @Type(name = "NEQ", value = NotEqualsExpression.class),
     @Type(name = "OR", value = OrExpression.class), @Type(name = "PLUS", value = PlusExpression.class),
-    @Type(name = "POW", value = PowExpression.class), @Type(name = "TIMES", value = TimesExpression.class),
+    @Type(name = "POW", value = PowExpression.class), @Type(name = "SPLIT", value = SplitExpression.class),
+    @Type(name = "TIMES", value = TimesExpression.class),
     /* Nary */
     @Type(name = "CONDITION", value = ConditionalExpression.class),
     @Type(name = "SUBSTR", value = SubstrExpression.class) })
