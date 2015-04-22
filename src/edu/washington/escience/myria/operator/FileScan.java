@@ -194,8 +194,8 @@ public final class FileScan extends LeafOperator {
             case BOOLEAN_TYPE:
               if (Floats.tryParse(cell) != null) {
                 buffer.putBoolean(column, Floats.tryParse(cell) != 0);
-              } else if (BooleanUtils.toBoolean(cell)) {
-                buffer.putBoolean(column, Boolean.parseBoolean(cell));
+              } else {
+                buffer.putBoolean(column, BooleanUtils.toBoolean(cell));
               }
               break;
             case DOUBLE_TYPE:
