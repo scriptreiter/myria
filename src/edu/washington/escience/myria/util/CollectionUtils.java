@@ -29,7 +29,7 @@ import com.google.common.collect.Iterables;
  * 
  * @author <a href="mailto:jmkristian@gmail.com?subject=Cartesian.product">John Kristian</a>
  */
-public final class ListUtils {
+public final class CollectionUtils {
   /**
    * Generate the <a href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian product</a> of the given axes. For
    * axes [[a1, a2 ...], [b1, b2 ...], [c1, c2 ...] ...] the product is [{a1, b1, c1 ...} ... {a1, b1, c2 ...} ... {a1,
@@ -153,7 +153,7 @@ public final class ListUtils {
       /** Caution: the given array of axes is contained by reference, not cloned. */
       ProductIterator(final Class<T> resultType, final Iterable<? extends T>[] axes) {
         _axes = axes;
-        _iterators = ListUtils.<Iterator<? extends T>> newArray(Iterator.class, _axes.length);
+        _iterators = CollectionUtils.<Iterator<? extends T>> newArray(Iterator.class, _axes.length);
         for (int a = 0; a < _axes.length; ++a) {
           _iterators[a] = axes[a].iterator();
         }

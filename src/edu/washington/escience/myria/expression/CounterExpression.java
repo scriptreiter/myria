@@ -43,8 +43,8 @@ public class CounterExpression extends UnaryExpression {
   @Override
   public String getJavaString(final ExpressionOperatorParameter parameters) {
     return new StringBuilder().append(
-        "com.google.common.collect.ContiguousSet.create(com.google.common.collect.Range.closedOpen(0L, ").append(
-        getOperand().getJavaString(parameters)).append("), com.google.common.collect.DiscreteDomain.longs())")
+        "com.google.common.collect.ContiguousSet.create(com.google.common.collect.Range.closedOpen(0L, (long) ")
+        .append(getOperand().getJavaString(parameters)).append("), com.google.common.collect.DiscreteDomain.longs())")
         .toString();
   }
 

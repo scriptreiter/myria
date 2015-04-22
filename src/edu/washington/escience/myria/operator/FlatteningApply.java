@@ -2,14 +2,17 @@ package edu.washington.escience.myria.operator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import edu.washington.escience.myria.DbException;
 import edu.washington.escience.myria.Schema;
@@ -19,8 +22,7 @@ import edu.washington.escience.myria.expression.evaluate.ExpressionOperatorParam
 import edu.washington.escience.myria.expression.evaluate.FlatteningGenericEvaluator;
 import edu.washington.escience.myria.storage.TupleBatch;
 import edu.washington.escience.myria.storage.TupleBatchBuffer;
-import edu.washington.escience.myria.storage.TupleUtils;
-import edu.washington.escience.myria.util.ListUtils;
+import edu.washington.escience.myria.util.CollectionUtils;
 
 /**
  * Generic apply operator for vector-valued expressions.
@@ -51,7 +53,7 @@ public class FlatteningApply extends UnaryOperator {
    * in each expression evaluation). Must be an empty array if no columns are to be retained.
    */
   @Nonnull
-  private int[] columnsToKeep = {};
+  private ImmutableSet<Integer> columnsToKeep = ImmutableSet.of();
 
   /**
    * @return the {@link #emitExpressions}
@@ -68,20 +70,31 @@ public class FlatteningApply extends UnaryOperator {
   }
 
   /**
+   * The logger for debug, trace, etc. messages in this class.
+   */
+  private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(FlatteningApply.class);
+
+  /**
    * 
    * @param child child operator that data is fetched from
    * @param emitExpressions expression that created the output
-   * @param columnsToKeep indexes of columns to keep from input relation
+   * @param columnsToKeep indexes of columns to keep from input relation (can be null if no columns are to be retained)
    */
-  public FlatteningApply(@Nonnull final Operator child, @Nonnull final List<Expression> emitExpressions,
-      final int[] columnsToKeep) {
+  public FlatteningApply(final Operator child, @Nonnull final List<Expression> emitExpressions,
+      final Set<Integer> columnsToKeep) {
     super(child);
-    Preconditions.checkNotNull(child);
     Preconditions.checkNotNull(emitExpressions);
     setEmitExpressions(emitExpressions);
-    if (columnsToKeep != null) {
-      this.columnsToKeep = columnsToKeep;
-    }
+    setColumnsToKeep(columnsToKeep);
+  }
+
+  /**
+   * 
+   * @param child child operator that data is fetched from
+   * @param emitExpressions expression that created the output
+   */
+  public FlatteningApply(final Operator child, @Nonnull final List<Expression> emitExpressions) {
+    this(child, emitExpressions, null);
   }
 
   /**
@@ -89,6 +102,15 @@ public class FlatteningApply extends UnaryOperator {
    */
   private void setEmitExpressions(@Nonnull final List<Expression> emitExpressions) {
     this.emitExpressions = ImmutableList.copyOf(emitExpressions);
+  }
+
+  /**
+   * @param columnsToKeep indexes of columns to keep from input relation
+   */
+  private void setColumnsToKeep(final Set<Integer> columnsToKeep) {
+    if (columnsToKeep != null) {
+      this.columnsToKeep = ImmutableSet.copyOf(columnsToKeep);
+    }
   }
 
   @Override
@@ -102,17 +124,19 @@ public class FlatteningApply extends UnaryOperator {
           // Call each evaluator on current row, then take Cartesian product of all output iterables from each
           // evaluator.
           List<Iterable<?>> evalResults = new ArrayList<>();
+          // Duplicate the values in this row of all columns we are keeping from the original relation by adding
+          // singleton iterator for each column to keep.
+          for (int colKeepIdx : columnsToKeep) {
+            evalResults.add(Collections.singleton(inputTuples.getObject(colKeepIdx, rowIdx)));
+          }
           for (FlatteningGenericEvaluator<?> evaluator : emitEvaluators) {
             Iterable<?> it = evaluator.eval(inputTuples, rowIdx, null);
             evalResults.add(it);
           }
-          Iterable<Object[]> allCombinations = ListUtils.cartesianProduct(Object.class, evalResults);
+          Iterable<Object[]> allCombinations = CollectionUtils.cartesianProduct(Object.class, evalResults);
           for (Object[] combination : allCombinations) {
-            // Duplicate the values of all columns we are keeping from the original relation in this row.
             int colIdx = 0;
-            for (int colKeepIdx : columnsToKeep) {
-              TupleUtils.copyValue(inputTuples.asColumn(colKeepIdx), rowIdx, outputBuffer, colIdx++);
-            }
+            // Insert a new row for the current value of the Cartesian product.
             for (Object value : combination) {
               outputBuffer.put(colIdx++, value);
             }
