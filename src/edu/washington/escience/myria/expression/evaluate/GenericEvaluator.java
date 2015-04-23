@@ -65,7 +65,7 @@ public class GenericEvaluator extends Evaluator {
       throw new DbException("Could not create expression evaluator", e);
     }
 
-    // se.setExpressionType(Void.TYPE);
+    se.setExpressionType(Void.TYPE);
     se.setDefaultImports(MyriaConstants.DEFAULT_JANINO_IMPORTS);
 
     try {

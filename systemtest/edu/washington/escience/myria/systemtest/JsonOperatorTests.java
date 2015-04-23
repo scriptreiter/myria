@@ -8,8 +8,6 @@ import java.nio.file.Paths;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -28,7 +26,6 @@ import edu.washington.escience.myria.api.encoding.QueryEncoding;
 import edu.washington.escience.myria.api.encoding.QueryStatusEncoding;
 import edu.washington.escience.myria.api.encoding.QueryStatusEncoding.Status;
 import edu.washington.escience.myria.api.encoding.SingletonEncoding;
-import edu.washington.escience.myria.api.encoding.SplitEncoding;
 import edu.washington.escience.myria.api.encoding.plan.SubQueryEncoding;
 import edu.washington.escience.myria.expression.ConstantExpression;
 import edu.washington.escience.myria.expression.CounterExpression;
@@ -45,8 +42,6 @@ import edu.washington.escience.myria.util.JsonAPIUtils;
  * serializability of the operator.
  */
 public class JsonOperatorTests extends SystemTestBase {
-
-  static Logger LOGGER = LoggerFactory.getLogger(JsonOperatorTests.class);
 
   @Test
   public void crossWithSingletonTest() throws Exception {
@@ -82,62 +77,6 @@ public class JsonOperatorTests extends SystemTestBase {
     }
     QueryStatusEncoding status = server.getQueryManager().getQueryStatus(queryId);
     assertEquals(status.message, Status.SUCCESS, status.status);
-  }
-
-  @Test
-  public void splitTest() throws Exception {
-    File currentDir = new File(".");
-    DataSource source =
-        new FileSource(Paths.get(currentDir.getAbsolutePath(), "testdata", "filescan", "one_col_string_array.txt")
-            .toString());
-
-    Schema schema = Schema.of(ImmutableList.of(Type.STRING_TYPE), ImmutableList.of("string_array"));
-    FileScanEncoding fs = new FileScanEncoding();
-    fs.source = source;
-    fs.schema = schema;
-    fs.delimiter = ',';
-    fs.quote = null;
-    fs.escape = null;
-    fs.skip = null;
-    fs.opId = 0;
-    SplitEncoding split = new SplitEncoding();
-    split.splitColumnIndex = 0;
-    split.regex = ":";
-    split.argChild = fs.opId;
-    split.opId = 1;
-    RelationKey outputRelation = RelationKey.of("test", "split", "output");
-    DbInsertEncoding insert = new DbInsertEncoding();
-    insert.opId = 2;
-    insert.argChild = split.opId;
-    insert.relationKey = outputRelation;
-    insert.argOverwriteTable = true;
-    PlanFragmentEncoding frag = PlanFragmentEncoding.of(fs, split, insert);
-    // HACK: if this test runs with multiple workers then each will duplicate the FileScan input relation and send
-    // the coordinator duplicate results which will be concatenated in the output.
-    int minWorkerID = Ints.min(workerIDs);
-    frag.overrideWorkers = ImmutableList.of(minWorkerID);
-
-    QueryEncoding query = new QueryEncoding();
-    query.plan = new SubQueryEncoding(ImmutableList.of(frag));
-    query.logicalRa = "Split test";
-    query.rawQuery = query.logicalRa;
-
-    HttpURLConnection conn = submitQuery(query);
-    assertEquals(HttpStatus.SC_ACCEPTED, conn.getResponseCode());
-    long queryId = getQueryStatus(conn).queryId;
-    conn.disconnect();
-    while (!server.getQueryManager().queryCompleted(queryId)) {
-      Thread.sleep(1);
-    }
-    QueryStatusEncoding status = server.getQueryManager().getQueryStatus(queryId);
-    assertEquals(status.message, Status.SUCCESS, status.status);
-
-    String data =
-        JsonAPIUtils.download("localhost", masterDaemonPort, outputRelation.getUserName(), outputRelation
-            .getProgramName(), outputRelation.getRelationName(), "json");
-    String expectedData =
-        "[{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"a\"},{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"b\"},{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"c\"},{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"d\"},{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"e\"},{\"string_array\":\"a:b:c:d:e:f\",\"string_array_splits\":\"f\"}]";
-    assertEquals(expectedData, data);
   }
 
   @Test
@@ -199,8 +138,7 @@ public class JsonOperatorTests extends SystemTestBase {
 
     String data =
         JsonAPIUtils.download("localhost", masterDaemonPort, outputRelation.getUserName(), outputRelation
-            .getProgramName(), outputRelation.getRelationName(), "json");
-    LOGGER.info("Data from query:\n{}", data);
+            .getProgramName(), outputRelation.getRelationName(), "json");;
     String expectedData =
         "[{\"boolean\":true,\"counter\":0,\"split\":\"a\"},{\"boolean\":true,\"counter\":0,\"split\":\"b\"},{\"boolean\":false,\"counter\":0,\"split\":\"c\"},{\"boolean\":false,\"counter\":0,\"split\":\"d\"},{\"boolean\":false,\"counter\":1,\"split\":\"c\"},{\"boolean\":false,\"counter\":1,\"split\":\"d\"}]";
     assertEquals(expectedData, data);
