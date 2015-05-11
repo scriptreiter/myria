@@ -41,6 +41,10 @@ public class Expression implements Serializable {
    */
   public static final String RESULT = "result";
   /**
+   * Variable name of result count.
+   */
+  public static final String COUNT = "count";
+  /**
    * Variable name of input tuple batch.
    */
   public static final String TB = "tb";
@@ -48,6 +52,10 @@ public class Expression implements Serializable {
    * Variable name of row index.
    */
   public static final String ROW = "row";
+  /**
+   * Variable name of row index.
+   */
+  public static final String COL = "col";
   /**
    * Variable name of state.
    */
@@ -112,8 +120,22 @@ public class Expression implements Serializable {
    * @return the Java form of this expression that also writes the results to a {@link ColumnBuilder}.
    */
   public String getJavaExpressionWithAppend(final ExpressionOperatorParameter parameters) {
-    return new StringBuilder(RESULT).append(".append").append(getOutputType(parameters).getName()).append("(").append(
-        getJavaExpression(parameters)).append(")").toString();
+    String appendExpression = rootExpressionOperator.getJavaExpressionWithAppend(parameters);
+    if (appendExpression == null) {
+      if (isMultivalued()) {
+        String primitiveTypeName = getOutputType(parameters).toJavaType().getName();
+        appendExpression =
+            new StringBuilder(primitiveTypeName).append("[] results = ").append(getJavaExpression(parameters)).append(
+                ";\n").append(COUNT).append(".appendInt(results.length);\n").append(
+                "for (int i = 0; i < results.length; ++i) {\n").append(RESULT).append(".put").append(
+                getOutputType(parameters).getName()).append("(").append(COL).append(", results[i]);\n}").toString();
+      } else {
+        appendExpression =
+            new StringBuilder(RESULT).append(".append").append(getOutputType(parameters).getName()).append("(").append(
+                getJavaExpression(parameters)).append(")").toString();
+      }
+    }
+    return appendExpression;
   }
 
   /**
@@ -165,7 +187,7 @@ public class Expression implements Serializable {
    * 
    * @return if this expression evaluates to an Iterable<T>
    */
-  public boolean isIterable() {
-    return rootExpressionOperator.hasIterableOutputType();
+  public boolean isMultivalued() {
+    return rootExpressionOperator.hasArrayOutputType();
   }
 }
