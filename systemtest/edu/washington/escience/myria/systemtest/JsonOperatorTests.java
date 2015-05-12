@@ -10,7 +10,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 
 import edu.washington.escience.myria.RelationKey;
@@ -106,7 +105,7 @@ public class JsonOperatorTests extends SystemTestBase {
     expressions.add(new Expression("split", split));
     FlatteningApplyEncoding flatApply = new FlatteningApplyEncoding();
     flatApply.emitExpressions = expressions.build();
-    flatApply.columnsToKeep = ImmutableSet.of(2);
+    flatApply.columnsToKeep = ImmutableList.of(2);
     flatApply.argChild = fs.opId;
     flatApply.opId = 1;
     RelationKey outputRelation = RelationKey.of("test", "flatteningApply", "output");

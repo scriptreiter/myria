@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 import edu.washington.escience.myria.DbException;
 import edu.washington.escience.myria.Schema;
@@ -63,7 +62,7 @@ public class FlatteningApplyTest {
     ExpressionOperator split = new SplitExpression(splitColIdx, regex);
     Expressions.add(new Expression("joined_ints_splits", split));
 
-    FlatteningApply apply = new FlatteningApply(new TupleSource(input), Expressions.build(), ImmutableSet.of(0, 2));
+    FlatteningApply apply = new FlatteningApply(new TupleSource(input), Expressions.build(), ImmutableList.of(0, 2));
     apply.open(TestEnvVars.get());
     int rowIdx = 0;
     while (!apply.eos()) {

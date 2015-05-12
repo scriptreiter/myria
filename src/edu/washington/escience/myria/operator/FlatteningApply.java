@@ -5,15 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 import edu.washington.escience.myria.DbException;
 import edu.washington.escience.myria.Schema;
@@ -62,7 +61,7 @@ public class FlatteningApply extends UnaryOperator {
    * in each expression evaluation). Must be an empty set if no columns are to be retained.
    */
   @Nonnull
-  private ImmutableSet<Integer> columnsToKeep = ImmutableSet.of();
+  private ImmutableList<Integer> columnsToKeep = ImmutableList.of();
 
   /**
    * @return the {@link #emitExpressions}
@@ -90,7 +89,7 @@ public class FlatteningApply extends UnaryOperator {
    * @param columnsToKeep indexes of columns to keep from input relation (can be null if no columns are to be retained)
    */
   public FlatteningApply(final Operator child, @Nonnull final List<Expression> emitExpressions,
-      final Set<Integer> columnsToKeep) {
+      final List<Integer> columnsToKeep) {
     super(child);
     Preconditions.checkNotNull(emitExpressions);
     setEmitExpressions(emitExpressions);
@@ -116,9 +115,12 @@ public class FlatteningApply extends UnaryOperator {
   /**
    * @param columnsToKeep indexes of columns to keep from input relation
    */
-  private void setColumnsToKeep(final Set<Integer> columnsToKeep) {
+  private void setColumnsToKeep(final List<Integer> columnsToKeep) {
     if (columnsToKeep != null) {
-      this.columnsToKeep = ImmutableSet.copyOf(columnsToKeep);
+      boolean sorted = Ordering.natural().isStrictlyOrdered(columnsToKeep);
+      Preconditions.checkArgument(sorted, "List of retained columns {} must be sorted and contain no duplicates.",
+          columnsToKeep);
+      this.columnsToKeep = ImmutableList.copyOf(columnsToKeep);
     }
   }
 
