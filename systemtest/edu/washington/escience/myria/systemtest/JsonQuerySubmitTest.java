@@ -256,6 +256,21 @@ public class JsonQuerySubmitTest extends SystemTestBase {
   }
 
   @Test
+  public void sgResultTest() throws Exception {
+    jsonQuerySubmitWithResultCheck(new String[] { "./jsonQueries/same_generation_jwang/ingest_arc.json" },
+        new String[] { "./jsonQueries/same_generation_jwang/sg.json" },
+        new String[] { "./jsonQueries/same_generation_jwang/expected_result" }, new String[] { "jwang:sg:result" });
+  }
+
+  @Test
+  public void apspResultTest() throws Exception {
+    jsonQuerySubmitWithResultCheck(new String[] { "./jsonQueries/shortest_paths_jwang/ingest_arc.json" },
+        new String[] { "./jsonQueries/shortest_paths_jwang/apsp.json" },
+        new String[] { "./jsonQueries/shortest_paths_jwang/apsp_expected_result" },
+        new String[] { "jwang:apsp:result" });
+  }
+
+  @Test
   public void partyResultTest() throws Exception {
     jsonQuerySubmitWithResultCheck(new String[] {
         "./jsonQueries/come_to_the_party_jwang/ingest_friend.json",
@@ -269,7 +284,17 @@ public class JsonQuerySubmitTest extends SystemTestBase {
     jsonQuerySubmitWithResultCheck(new String[] {
         "./jsonQueries/multiIDB_jwang/ingest_a0.json", "./jsonQueries/multiIDB_jwang/ingest_b0.json",
         "./jsonQueries/multiIDB_jwang/ingest_c0.json", "./jsonQueries/multiIDB_jwang/ingest_r.json" },
-        new String[] { "./jsonQueries/multiIDB_jwang/joinChain.json" }, new String[] {}, new String[] {});
+        new String[] { "./jsonQueries/multiIDB_jwang/joinChain.json" },
+        new String[] { "./jsonQueries/multiIDB_jwang/joinChain_c_expected" }, new String[] { "jwang:joinChain:C" });
+  }
+
+  @Test
+  public void joinCircleResultTest() throws Exception {
+    jsonQuerySubmitWithResultCheck(new String[] {
+        "./jsonQueries/multiIDB_jwang/ingest_a0.json", "./jsonQueries/multiIDB_jwang/ingest_b0.json",
+        "./jsonQueries/multiIDB_jwang/ingest_c0.json" },
+        new String[] { "./jsonQueries/multiIDB_jwang/joinCircle.json" },
+        new String[] { "./jsonQueries/multiIDB_jwang/joinCircle_c_expected" }, new String[] { "jwang:joinCircle:C" });
   }
 
   @Test
