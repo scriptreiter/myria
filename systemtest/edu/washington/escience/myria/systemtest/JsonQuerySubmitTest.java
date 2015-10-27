@@ -256,6 +256,14 @@ public class JsonQuerySubmitTest extends SystemTestBase {
   }
 
   @Test
+  public void lcaResultTest() throws Exception {
+    jsonQuerySubmitWithResultCheck(new String[] {
+        "./jsonQueries/lca_jwang/ingest_papers.json", "./jsonQueries/lca_jwang/ingest_cites.json" },
+        new String[] { "./jsonQueries/lca_jwang/lca.json" },
+        new String[] { "./jsonQueries/lca_jwang/expected_result" }, new String[] { "jwang:lca:result" });
+  }
+
+  @Test
   public void sgResultTest() throws Exception {
     jsonQuerySubmitWithResultCheck(new String[] { "./jsonQueries/same_generation_jwang/ingest_arc.json" },
         new String[] { "./jsonQueries/same_generation_jwang/sg.json" },
