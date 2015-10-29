@@ -306,6 +306,16 @@ public class JsonQuerySubmitTest extends SystemTestBase {
   }
 
   @Test
+  public void galaxyEvilutionResultTest() throws Exception {
+    jsonQuerySubmitWithResultCheck(new String[] {
+        "./jsonQueries/galaxy_evolution_jwang/ingest_particles.json",
+        "./jsonQueries/galaxy_evolution_jwang/ingest_galaxies_of_interest.json" },
+        new String[] { "./jsonQueries/galaxy_evolution_jwang/galaxy_evolution.json" },
+        new String[] { "./jsonQueries/galaxy_evolution_jwang/expected_result" },
+        new String[] { "jwang:galaxy_evolution:result" });
+  }
+
+  @Test
   public void abortedDownloadTest() throws Exception {
     // skip in travis
     TestUtils.skipIfInTravis();
