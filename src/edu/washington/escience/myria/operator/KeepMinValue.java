@@ -176,7 +176,7 @@ public final class KeepMinValue extends StreamingState {
 
   @Override
   public Schema getSchema() {
-    return getOp().getSchema();
+    return getOp().getInputSchema();
   }
 
   @Override

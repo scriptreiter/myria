@@ -799,8 +799,8 @@ public final class LocalFragment {
           subQueryId);
       addResourceReport(stats, timestamp, op, "numTuplesInBuffers", ((Producer) op).getNumTuplesInBuffers(), subQueryId);
     } else if (op instanceof IDBController) {
-      addResourceReport(stats, timestamp, op, "numTuplesInState", ((IDBController) op).getStreamingState().numTuples(),
-          subQueryId);
+      addResourceReport(stats, timestamp, op, "numTuplesInState", ((IDBController) op).getStreamingStates().get(0)
+          .numTuples(), subQueryId);
     } else if (op instanceof SymmetricHashJoin) {
       addResourceReport(stats, timestamp, op, "hashTableSize", ((SymmetricHashJoin) op).getNumTuplesInHashTables(),
           subQueryId);

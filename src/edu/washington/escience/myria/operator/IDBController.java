@@ -170,8 +170,7 @@ public class IDBController extends Operator implements StreamingStateful, DbWrit
     this.initialIDBInput = initialIDBInput;
     this.iterationInput = iterationInput;
     this.eosControllerInput = eosControllerInput;
-    this.state = state;
-    this.state.setAttachedOperator(this);
+    setStreamingStates(ImmutableList.of(state));
     this.sync = sync;
   }
 
@@ -302,11 +301,19 @@ public class IDBController extends Operator implements StreamingStateful, DbWrit
   }
 
   @Override
-  public final Schema generateSchema() {
-    if (!(initialIDBInput instanceof EmptyRelation)) {
+  public final Schema getInputSchema() {
+    if (initialIDBInput != null) {
       return initialIDBInput.getSchema();
     }
-    return iterationInput.getSchema();
+    if (iterationInput != null) {
+      return iterationInput.getSchema();
+    }
+    return null;
+  }
+
+  @Override
+  public final Schema generateSchema() {
+    return state.getSchema();
   }
 
   /**
@@ -398,13 +405,14 @@ public class IDBController extends Operator implements StreamingStateful, DbWrit
   }
 
   @Override
-  public void setStreamingState(final StreamingState state) {
-    this.state = state;
+  public void setStreamingStates(final List<StreamingState> states) {
+    state = states.get(0);
+    state.setAttachedOperator(this);
   }
 
   @Override
-  public StreamingState getStreamingState() {
-    return state;
+  public List<StreamingState> getStreamingStates() {
+    return ImmutableList.of(state);
   }
 
   /**
