@@ -53,6 +53,7 @@ import edu.washington.escience.myria.operator.SampledDbInsertTemp;
     @Type(name = "Sample", value = SampleEncoding.class),
     @Type(name = "SamplingDistribution", value = SamplingDistributionEncoding.class),
     @Type(name = "SeaFlowScan", value = SeaFlowFileScanEncoding.class),
+    @Type(name = "Seq", value = SeqEncoding.class),
     @Type(name = "SetGlobal", value = SetGlobalEncoding.class),
     @Type(name = "ShuffleConsumer", value = ShuffleConsumerEncoding.class),
     @Type(name = "ShuffleProducer", value = ShuffleProducerEncoding.class),
